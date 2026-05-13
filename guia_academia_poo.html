@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guia Completo — Sistema de Academia POO</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #f7a26a;
+    --accent3: #6af7c8;
+    --accent4: #f76a8a;
+    --text: #e8e8f0;
+    --text-muted: #888899;
+    --text-dim: #555566;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* SIDEBAR NAV */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 2rem 0;
+    overflow-y: auto;
+    z-index: 100;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar-logo {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-logo .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .sidebar-logo h2 {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .nav-section {
+    padding: 0.5rem 0;
+  }
+
+  .nav-section-title {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.5rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-family: var(--sans);
+    font-weight: 400;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--surface2);
+    border-left-color: var(--accent);
+  }
+
+  .nav-link .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 5rem 4rem 4rem;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: 200px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(106,247,200,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-kicker::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+  }
+
+  .hero-tags {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .tag-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 100px;
+    border: 1px solid;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-pill.java { color: var(--accent2); border-color: rgba(247,162,106,0.3); background: rgba(247,162,106,0.05); }
+  .tag-pill.poo { color: var(--accent); border-color: rgba(124,106,247,0.3); background: rgba(124,106,247,0.05); }
+  .tag-pill.bd { color: var(--accent3); border-color: rgba(106,247,200,0.3); background: rgba(106,247,200,0.05); }
+  .tag-pill.cp { color: var(--accent4); border-color: rgba(247,106,138,0.3); background: rgba(247,106,138,0.05); }
+
+  /* SECTION */
+  .section {
+    padding: 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    padding-top: 0.4rem;
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+
+  .section-title-wrap h2 {
+    font-family: var(--display);
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .section-title-wrap p {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  /* CONCEPT CARDS */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .concept-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .concept-card.purple::before { background: var(--accent); }
+  .concept-card.orange::before { background: var(--accent2); }
+  .concept-card.green::before { background: var(--accent3); }
+  .concept-card.pink::before { background: var(--accent4); }
+
+  .card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .card-title {
+    font-family: var(--display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-body {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: #0d0d14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-filename {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .code-lang {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .code-content {
+    padding: 1.2rem 1.5rem;
+    font-size: 12.5px;
+    line-height: 1.8;
+    overflow-x: auto;
+    tab-size: 4;
+    white-space: pre;
+  }
+
+  /* SYNTAX */
+  .kw { color: #c792ea; }
+  .cls { color: #82aaff; }
+  .fn { color: #82e0aa; }
+  .str { color: #c3e88d; }
+  .cm { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .ann { color: #ffcb6b; }
+  .iface { color: #80cbc4; }
+  .op { color: #89ddff; }
+
+  /* ANALOGY BOXES */
+  .analogy {
+    background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(106,247,200,0.05));
+    border: 1px solid rgba(124,106,247,0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    position: relative;
+  }
+
+  .analogy::before {
+    content: '💡 ANALOGIA';
+    position: absolute;
+    top: -10px;
+    left: 1rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    background: var(--bg);
+    padding: 0 0.5rem;
+  }
+
+  .analogy p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .analogy strong {
+    color: var(--accent3);
+  }
+
+  /* WARNING / IMPORTANT */
+  .callout {
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+
+  .callout.tip {
+    background: rgba(106,247,200,0.06);
+    border: 1px solid rgba(106,247,200,0.2);
+  }
+
+  .callout.warn {
+    background: rgba(247,162,106,0.06);
+    border: 1px solid rgba(247,162,106,0.2);
+  }
+
+  .callout.info {
+    background: rgba(124,106,247,0.06);
+    border: 1px solid rgba(124,106,247,0.2);
+  }
+
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; }
+
+  .callout-body { font-size: 13.5px; line-height: 1.7; }
+
+  .callout.tip .callout-body { color: rgba(106,247,200,0.9); }
+  .callout.warn .callout-body { color: rgba(247,162,106,0.9); }
+  .callout.info .callout-body { color: rgba(190,180,255,0.9); }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.5rem 0;
+  }
+
+  .flow-step {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .flow-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .flow-dot.ok { background: rgba(106,247,200,0.15); color: var(--accent3); border: 1px solid rgba(106,247,200,0.3); }
+  .flow-dot.err { background: rgba(247,106,138,0.15); color: var(--accent4); border: 1px solid rgba(247,106,138,0.3); }
+  .flow-dot.num { background: rgba(124,106,247,0.15); color: var(--accent); border: 1px solid rgba(124,106,247,0.3); }
+
+  .flow-connector {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 2px 0;
+  }
+
+  .flow-content {
+    padding: 0.3rem 0 1rem;
+  }
+
+  .flow-content .step-title {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+
+  .flow-content .step-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .flow-content .step-fail {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent4);
+    margin-top: 0.3rem;
+  }
+
+  /* TABLE */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 13.5px;
+  }
+
+  .styled-table th {
+    text-align: left;
+    padding: 0.7rem 1rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .styled-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(42,42,58,0.5);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .styled-table tr:hover td {
+    background: var(--surface);
+  }
+
+  .styled-table td:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* HIERARCHY TREE */
+  .tree {
+    font-family: var(--mono);
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    line-height: 2;
+    margin: 1.5rem 0;
+  }
+
+  .tree .tree-root { color: var(--accent2); font-weight: 700; }
+  .tree .tree-abstract { color: var(--accent); }
+  .tree .tree-class { color: var(--accent3); }
+  .tree .tree-interface { color: var(--accent4); }
+  .tree .tree-note { color: var(--text-dim); font-size: 11px; }
+  .tree .tree-connector { color: var(--text-dim); }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge.purple { background: rgba(124,106,247,0.15); color: var(--accent); }
+  .badge.green { background: rgba(106,247,200,0.15); color: var(--accent3); }
+  .badge.orange { background: rgba(247,162,106,0.15); color: var(--accent2); }
+  .badge.pink { background: rgba(247,106,138,0.15); color: var(--accent4); }
+
+  /* INLINE CODE */
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: rgba(124,106,247,0.1);
+    color: var(--accent);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid rgba(124,106,247,0.2);
+  }
+
+  /* PACKAGE MAP */
+  .pkg-map {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .pkg-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .pkg-header {
+    padding: 0.6rem 1rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .pkg-body {
+    padding: 0.8rem 1rem;
+    font-size: 12.5px;
+  }
+
+  .pkg-file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .pkg-file .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+  .pkg-box.model .pkg-header { background: rgba(124,106,247,0.1); color: var(--accent); }
+  .pkg-box.model .dot { background: var(--accent); }
+  .pkg-box.dao .pkg-header { background: rgba(247,162,106,0.1); color: var(--accent2); }
+  .pkg-box.dao .dot { background: var(--accent2); }
+  .pkg-box.service .pkg-header { background: rgba(106,247,200,0.1); color: var(--accent3); }
+  .pkg-box.service .dot { background: var(--accent3); }
+  .pkg-box.util .pkg-header { background: rgba(247,106,138,0.1); color: var(--accent4); }
+  .pkg-box.util .dot { background: var(--accent4); }
+  .pkg-box.root .pkg-header { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+  .pkg-box.root .dot { background: var(--text-dim); }
+
+  /* QUESTION / ANSWER */
+  .qa {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+
+  .qa-q {
+    padding: 1rem 1.2rem;
+    background: var(--surface);
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    user-select: none;
+  }
+
+  .qa-q::before {
+    content: '?';
+    width: 22px;
+    height: 22px;
+    background: rgba(124,106,247,0.15);
+    color: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .qa-a {
+    padding: 1rem 1.2rem;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    border-top: 1px solid var(--border);
+  }
+
+  /* CRUD TABLE */
+  .crud-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+  }
+
+  .crud-table th {
+    padding: 0.6rem 1rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .crud-table th:first-child { text-align: left; }
+
+  .crud-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(42,42,58,0.4);
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .crud-table td:first-child {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  /* DB SCHEMA */
+  .db-schema {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .db-table {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .db-table-header {
+    padding: 0.6rem 1rem;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    color: var(--accent2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .db-table-header::before {
+    content: '⊞';
+    font-size: 14px;
+  }
+
+  .db-col {
+    padding: 0.35rem 1rem;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(42,42,58,0.3);
+  }
+
+  .db-col:last-child { border-bottom: none; }
+
+  .db-col.pk { color: var(--accent2); }
+  .db-col.fk { color: var(--accent3); }
+
+  .db-col-type {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* MEMBER CARDS */
+  .member-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .member-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+
+  .member-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 auto 0.8rem;
+    color: var(--bg);
+  }
+
+  .member-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .member-ra {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 2rem 0;
+  }
+
+  /* h3, h4 */
+  h3 {
+    font-family: var(--display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  h4 {
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.8rem;
+    color: var(--text-muted);
+  }
+
+  p { margin-bottom: 1rem; }
+
+  ul, ol {
+    padding-left: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 0.4rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  li strong { color: var(--text); }
+
+  strong { color: var(--text); }
+
+  /* SCROLL BAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .section, .hero { padding: 2rem; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section { animation: fadeUp 0.4s ease both; }
+
+  /* CHECKPOINT TIMELINE */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -1.6rem;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid;
+  }
+
+  .tl-item.cp1::before { border-color: var(--accent4); background: rgba(247,106,138,0.2); }
+  .tl-item.cp2::before { border-color: var(--accent2); background: rgba(247,162,106,0.2); }
+  .tl-item.cp3::before { border-color: var(--accent3); background: rgba(106,247,200,0.2); }
+  .tl-item.cp4::before { border-color: var(--accent); background: rgba(124,106,247,0.2); }
+
+  .tl-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .tl-item.cp1 .tl-label { color: var(--accent4); }
+  .tl-item.cp2 .tl-label { color: var(--accent2); }
+  .tl-item.cp3 .tl-label { color: var(--accent3); }
+  .tl-item.cp4 .tl-label { color: var(--accent); }
+
+  .tl-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .tl-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* HIGHLIGHT ROWS */
+  .highlight-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .highlight-box h4 {
+    margin-top: 0;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="tag">POO + BD · CP4</div>
+    <h2>Sistema de<br>Academia</h2>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Visão Geral</div>
+    <a href="#intro" class="nav-link"><span class="dot" style="background:#7c6af7"></span>Introdução</a>
+    <a href="#equipe" class="nav-link"><span class="dot" style="background:#f76a8a"></span>Equipe</a>
+    <a href="#checkpoints" class="nav-link"><span class="dot" style="background:#f7a26a"></span>Checkpoints</a>
+    <a href="#arquitetura" class="nav-link"><span class="dot" style="background:#6af7c8"></span>Arquitetura</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Conceitos POO</div>
+    <a href="#encapsulamento" class="nav-link"><span class="dot" style="background:#f76a8a"></span>Encapsulamento</a>
+    <a href="#heranca" class="nav-link"><span class="dot" style="background:#f7a26a"></span>Herança</a>
+    <a href="#polimorfismo" class="nav-link"><span class="dot" style="background:#7c6af7"></span>Polimorfismo</a>
+    <a href="#abstrata" class="nav-link"><span class="dot" style="background:#6af7c8"></span>Classe Abstrata</a>
+    <a href="#interfaces" class="nav-link"><span class="dot" style="background:#7c6af7"></span>Interfaces (CP4)</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Banco de Dados</div>
+    <a href="#dao" class="nav-link"><span class="dot" style="background:#f7a26a"></span>Padrão DAO</a>
+    <a href="#bd-schema" class="nav-link"><span class="dot" style="background:#6af7c8"></span>Schema do BD</a>
+    <a href="#jdbc" class="nav-link"><span class="dot" style="background:#7c6af7"></span>JDBC</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Sistema</div>
+    <a href="#regra" class="nav-link"><span class="dot" style="background:#f76a8a"></span>Regra de Negócio</a>
+    <a href="#crud" class="nav-link"><span class="dot" style="background:#f7a26a"></span>CRUD Completo</a>
+    <a href="#perguntas" class="nav-link"><span class="dot" style="background:#6af7c8"></span>Perguntas Prováveis</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-kicker">Guia de Apresentação</div>
+    <h1>Sistema de<br><span>Gerenciamento<br>de Academia</span></h1>
+    <p class="hero-sub">
+      Um guia absurdamente didático de tudo que existe neste projeto — conceitos POO, banco de dados, regras de negócio e o código completo explicado linha por linha.
+    </p>
+    <div class="hero-tags">
+      <span class="tag-pill java">Java 17+</span>
+      <span class="tag-pill poo">Orientação a Objetos</span>
+      <span class="tag-pill bd">PostgreSQL + JDBC</span>
+      <span class="tag-pill cp">CP1 → CP4</span>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <div class="section-title-wrap">
+        <h2>O que é este projeto?</h2>
+        <p>Visão geral do sistema em linguagem simples</p>
+      </div>
+    </div>
+
+    <p>Este é um sistema de gerenciamento de academia desenvolvido em <strong>Java</strong>, com persistência de dados em <strong>PostgreSQL</strong>. Ele roda no terminal (linha de comando) e permite que um funcionário da academia gerencie tudo: alunos, instrutores, planos, aulas coletivas e controle de presença.</p>
+
+    <div class="analogy">
+      <p>Imagine que você é recepcionista de uma academia. Antes deste sistema, você usava papel e caneta pra tudo — anotar quem se matriculou, qual plano escolheu, em quais aulas está inscrito, quando entrou na academia. <strong>Este sistema substitui exatamente esse papel e caneta</strong>, mas com validações automáticas, banco de dados e código orientado a objetos.</p>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card purple">
+        <div class="card-icon">🏋️</div>
+        <div class="card-title">Alunos</div>
+        <div class="card-body">Cadastro completo com nome, CPF, e-mail, data de nascimento, data de matrícula e plano vinculado. O sistema calcula automaticamente se o plano está ativo ou vencido.</div>
+      </div>
+      <div class="concept-card orange">
+        <div class="card-icon">🧑‍🏫</div>
+        <div class="card-title">Instrutores</div>
+        <div class="card-body">Cada instrutor tem especialidade e horários de trabalho. Podem ser vinculados às aulas coletivas que ministram.</div>
+      </div>
+      <div class="concept-card green">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Planos</div>
+        <div class="card-body">Básico (1 mês), Intermediário (3 meses) ou Premium (6 meses). O sistema usa a duração do plano para calcular o vencimento automaticamente.</div>
+      </div>
+      <div class="concept-card pink">
+        <div class="card-icon">🧘</div>
+        <div class="card-title">Aulas & Inscrições</div>
+        <div class="card-body">Aulas coletivas com capacidade máxima e horário definido. A inscrição passa por 5 validações antes de ser confirmada.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPE -->
+  <section class="section" id="equipe">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <div class="section-title-wrap">
+        <h2>Equipe</h2>
+        <p>Integrantes do grupo</p>
+      </div>
+    </div>
+    <div class="member-grid">
+      <div class="member-card">
+        <div class="member-avatar">G</div>
+        <div class="member-name">Gabriel Macena Ramos</div>
+        <div class="member-ra">RA 45157286</div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">L</div>
+        <div class="member-name">Leonardo Vitale dos Santos</div>
+        <div class="member-ra">RA 45607028</div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">J</div>
+        <div class="member-name">Juliann Nicolas O. F. de Moraes</div>
+        <div class="member-ra">RA 44705280</div>
+      </div>
+      <div class="member-card">
+        <div class="member-avatar">C</div>
+        <div class="member-name">Carlos Henryque de Melo Alcantara</div>
+        <div class="member-ra">RA 45711402</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKPOINTS -->
+  <section class="section" id="checkpoints">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <div class="section-title-wrap">
+        <h2>Linha do Tempo</h2>
+        <p>O que foi entregue em cada checkpoint</p>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item cp1">
+        <div class="tl-label">CP1 · Fundação</div>
+        <div class="tl-title">Definição do Projeto + Classes Base</div>
+        <div class="tl-desc">Escolha do tema Academia. Definição das entidades principais. Primeiras classes com atributos e métodos simples. Encapsulamento com getters/setters.</div>
+      </div>
+      <div class="tl-item cp2">
+        <div class="tl-label">CP2 · Herança e Polimorfismo</div>
+        <div class="tl-title">Hierarquia de Classes</div>
+        <div class="tl-desc">Criação da superclasse abstrata <code>Pessoa</code>. Subclasses <code>Aluno</code>, <code>Instrutor</code>, <code>Funcionario</code>. Polimorfismo com <code>ArrayList&lt;Pessoa&gt;</code>. Sobrecarga de método <code>calcularMensalidade</code>.</div>
+      </div>
+      <div class="tl-item cp3">
+        <div class="tl-label">CP3 · Banco de Dados</div>
+        <div class="tl-title">PostgreSQL + JDBC + Padrão DAO</div>
+        <div class="tl-desc">Integração com PostgreSQL via JDBC. Criação de todos os DAOs. CRUD completo para as entidades. Primeira versão da regra de negócio de inscrição em aulas.</div>
+      </div>
+      <div class="tl-item cp4">
+        <div class="tl-label">CP4 · Entrega Final</div>
+        <div class="tl-title">Interfaces + Sistema 100% Funcional</div>
+        <div class="tl-desc">Interfaces <code>Auditavel</code> e <code>Relatorio</code>. Pacote <code>service/</code> com regra de negócio complexa (5 validações). Relatório com exportação para arquivo. Sistema completo e documentado.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARQUITETURA -->
+  <section class="section" id="arquitetura">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <div class="section-title-wrap">
+        <h2>Arquitetura do Projeto</h2>
+        <p>Como as pastas e arquivos estão organizados — e por quê</p>
+      </div>
+    </div>
+
+    <p>O projeto segue uma arquitetura em <strong>camadas</strong>, onde cada pasta tem uma responsabilidade bem definida. Isso é chamado de <strong>separação de responsabilidades</strong> e é uma das melhores práticas em desenvolvimento de software.</p>
+
+    <div class="pkg-map">
+      <div class="pkg-box model">
+        <div class="pkg-header">📦 model/</div>
+        <div class="pkg-body">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">As entidades do mundo real</div>
+          <div class="pkg-file"><span class="dot"></span>Pessoa.java</div>
+          <div class="pkg-file"><span class="dot"></span>Aluno.java</div>
+          <div class="pkg-file"><span class="dot"></span>Instrutor.java</div>
+          <div class="pkg-file"><span class="dot"></span>Funcionario.java</div>
+          <div class="pkg-file"><span class="dot"></span>Plano.java</div>
+          <div class="pkg-file"><span class="dot"></span>Aula.java</div>
+          <div class="pkg-file"><span class="dot"></span>Frequencia.java</div>
+        </div>
+      </div>
+      <div class="pkg-box dao">
+        <div class="pkg-header">🗄️ dao/</div>
+        <div class="pkg-body">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">Comunicação com o banco</div>
+          <div class="pkg-file"><span class="dot"></span>ConexaoBD.java</div>
+          <div class="pkg-file"><span class="dot"></span>AlunoDAO.java</div>
+          <div class="pkg-file"><span class="dot"></span>PlanoDAO.java</div>
+          <div class="pkg-file"><span class="dot"></span>InstrutorDAO.java</div>
+          <div class="pkg-file"><span class="dot"></span>AulaDAO.java</div>
+          <div class="pkg-file"><span class="dot"></span>FrequenciaDAO.java</div>
+          <div class="pkg-file"><span class="dot"></span>InscricaoDAO.java</div>
+        </div>
+      </div>
+      <div class="pkg-box service">
+        <div class="pkg-header">⚙️ service/</div>
+        <div class="pkg-body">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">Regras de negócio (CP4)</div>
+          <div class="pkg-file"><span class="dot"></span>InscricaoService.java</div>
+          <div class="pkg-file"><span class="dot"></span>RelatorioService.java</div>
+        </div>
+      </div>
+      <div class="pkg-box util">
+        <div class="pkg-header">🔧 util/</div>
+        <div class="pkg-body">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">Interfaces e utilitários</div>
+          <div class="pkg-file"><span class="dot"></span>Auditavel.java</div>
+          <div class="pkg-file"><span class="dot"></span>Relatorio.java</div>
+          <div class="pkg-file"><span class="dot"></span>ValidadorUtil.java</div>
+        </div>
+      </div>
+      <div class="pkg-box root">
+        <div class="pkg-header">📄 raiz</div>
+        <div class="pkg-body">
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:0.5rem;">Ponto de entrada</div>
+          <div class="pkg-file"><span class="dot"></span>Main.java</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analogy">
+      <p>Pense em um restaurante: o <strong>model</strong> é o cardápio (o que existe), o <strong>dao</strong> é a cozinha (onde os dados são "preparados" — buscados ou salvos no banco), o <strong>service</strong> é o gerente (aplica as regras: "não pode servir álcool para menor"), o <strong>util</strong> são os utensílios compartilhados, e o <strong>Main</strong> é o caixa — onde o cliente interage com tudo.</p>
+    </div>
+  </section>
+
+  <!-- ENCAPSULAMENTO -->
+  <section class="section" id="encapsulamento">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <div class="section-title-wrap">
+        <h2>Encapsulamento <span class="badge pink">CP1</span></h2>
+        <p>Proteger os dados da classe do mundo externo</p>
+      </div>
+    </div>
+
+    <p>Encapsulamento é o princípio de <strong>esconder os detalhes internos</strong> de uma classe e expor apenas o que é necessário. Em Java, isso é feito com modificadores de acesso (<code>private</code>, <code>public</code>, <code>protected</code>) e com <strong>getters e setters</strong>.</p>
+
+    <div class="analogy">
+      <p>Imagine seu CPF. Ele é um dado <strong>privado</strong> — você não sai exibindo para qualquer um. Mas se alguém precisar saber, você fornece de forma controlada. Em Java: o atributo é <code>private</code>, e você fornece acesso via <code>getCpf()</code>. E se alguém quiser alterar? Só pela função <code>setCpf()</code>, onde você pode inclusive validar antes de aceitar.</p>
+    </div>
+
+    <h3>Como está no projeto</h3>
+
+    <p>Veja a classe <code>Plano.java</code> — um exemplo perfeito de encapsulamento:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">model/Plano.java</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public class</span> <span class="cls">Plano</span> {
+    <span class="cm">// Atributos PRIVADOS — ninguém acessa diretamente de fora</span>
+    <span class="kw">private int</span> id;
+    <span class="kw">private</span> <span class="cls">String</span> nome;
+    <span class="kw">private double</span> valorMensal;
+    <span class="kw">private int</span> duracaoMeses;  <span class="cm">// ex: 1, 3 ou 6</span>
+
+    <span class="cm">// Para LER o nome: usa o getter</span>
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">getNome</span>() { <span class="kw">return</span> nome; }
+
+    <span class="cm">// Para ALTERAR o nome: usa o setter (aqui poderia ter validação)</span>
+    <span class="kw">public void</span> <span class="fn">setNome</span>(<span class="cls">String</span> nome) { <span class="kw">this</span>.nome = nome; }
+
+    <span class="cm">// Getter da duração (usada para calcular vencimento do plano)</span>
+    <span class="kw">public int</span> <span class="fn">getDuracaoMeses</span>() { <span class="kw">return</span> duracaoMeses; }
+}</div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body"><strong>Por que private?</strong> Se os atributos fossem <code>public</code>, qualquer parte do código poderia fazer <code>plano.valorMensal = -500</code> e quebrar a consistência dos dados. Com <code>private</code> + setter, você pode validar: "valorMensal não pode ser negativo".</div>
+    </div>
+
+    <h3>ValidadorUtil — encapsulamento de regras</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">util/ValidadorUtil.java</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public class</span> <span class="cls">ValidadorUtil</span> {
+
+    <span class="cm">// Valida CPF: deve ter exatamente 11 dígitos</span>
+    <span class="kw">public static boolean</span> <span class="fn">validarCpf</span>(<span class="cls">String</span> cpf) {
+        <span class="kw">if</span> (cpf == <span class="kw">null</span>) <span class="kw">return false</span>;
+        <span class="cls">String</span> limpo = cpf.replaceAll(<span class="str">"[^0-9]"</span>, <span class="str">""</span>);  <span class="cm">// remove pontos e traços</span>
+        <span class="kw">return</span> limpo.length() == <span class="num">11</span>;
+    }
+
+    <span class="cm">// Valida e-mail: precisa ter @ e .</span>
+    <span class="kw">public static boolean</span> <span class="fn">validarEmail</span>(<span class="cls">String</span> email) {
+        <span class="kw">return</span> email != <span class="kw">null</span> && email.contains(<span class="str">"@"</span>) && email.contains(<span class="str">"."</span>);
+    }
+}</div>
+    </div>
+  </section>
+
+  <!-- HERANÇA -->
+  <section class="section" id="heranca">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <div class="section-title-wrap">
+        <h2>Herança <span class="badge orange">CP2</span></h2>
+        <p>Reutilizar código através de hierarquias de classes</p>
+      </div>
+    </div>
+
+    <p>Herança permite que uma classe <strong>filho</strong> herde os atributos e métodos de uma classe <strong>pai</strong>. Em Java, usa-se a palavra-chave <code>extends</code>.</p>
+
+    <div class="analogy">
+      <p>Aluno, Instrutor e Funcionário são todos <strong>Pessoas</strong>. Todos têm nome, CPF e telefone. Em vez de repetir esses três atributos em cada classe, criamos uma classe-pai <code>Pessoa</code> com eles, e cada classe-filha <strong>herda</strong> automaticamente. É como dizer: "tudo que uma Pessoa tem, um Aluno também tem — mais as coisas específicas dele."</p>
+    </div>
+
+    <div class="tree">
+<span class="tree-root">Pessoa (superclasse abstrata)</span>
+<span class="tree-connector">├──</span> <span class="tree-class">Aluno</span>         <span class="tree-note">← extends Pessoa, implements Auditavel</span>
+<span class="tree-connector">│     </span><span class="tree-note">+ email, dataNascimento, dataMatricula, plano</span>
+<span class="tree-connector">│     </span><span class="tree-note">+ isPlanoAtivo(), getDataVencimentoPlano()</span>
+<span class="tree-connector">├──</span> <span class="tree-class">Instrutor</span>     <span class="tree-note">← extends Pessoa, implements Auditavel</span>
+<span class="tree-connector">│     </span><span class="tree-note">+ especialidade, horariosTrabalho, salario</span>
+<span class="tree-connector">└──</span> <span class="tree-class">Funcionario</span>   <span class="tree-note">← extends Pessoa</span>
+      <span class="tree-note">+ cargo, turno, salario</span>
+    </div>
+
+    <h3>A superclasse Pessoa</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">model/Pessoa.java</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public abstract class</span> <span class="cls">Pessoa</span> {
+    <span class="cm">// Atributos COMUNS a todos (Aluno, Instrutor, Funcionario)</span>
+    <span class="kw">protected int</span> id;
+    <span class="kw">protected</span> <span class="cls">String</span> nome;
+    <span class="kw">protected</span> <span class="cls">String</span> cpf;
+    <span class="kw">protected</span> <span class="cls">String</span> telefone;
+
+    <span class="cm">// Construtor: chamado pelo super() nas subclasses</span>
+    <span class="kw">public</span> <span class="fn">Pessoa</span>(<span class="kw">int</span> id, <span class="cls">String</span> nome, <span class="cls">String</span> cpf, <span class="cls">String</span> telefone) {
+        <span class="kw">this</span>.id = id;
+        <span class="kw">this</span>.nome = nome;
+        <span class="kw">this</span>.cpf = cpf;
+        <span class="kw">this</span>.telefone = telefone;
+    }
+
+    <span class="cm">// Método ABSTRATO: obriga cada subclasse a ter sua própria implementação</span>
+    <span class="kw">public abstract void</span> <span class="fn">exibirDetalhes</span>();
+
+    <span class="cm">// Método ABSTRATO: cada pessoa tem um custo diferente para a academia</span>
+    <span class="kw">public abstract double</span> <span class="fn">calcularCustoMensal</span>();
+
+    <span class="cm">// Método CONCRETO: compartilhado por todos, sem precisar reimplementar</span>
+    <span class="kw">public void</span> <span class="fn">exibirInformacoesBasicas</span>() {
+        System.out.println(<span class="str">"ID: "</span> + id + <span class="str">" | Nome: "</span> + nome + <span class="str">" | CPF: "</span> + cpf);
+    }
+}</div>
+    </div>
+
+    <h3>Como Aluno usa a herança</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">model/Aluno.java (trecho)</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="cm">// "extends Pessoa" = Aluno herda id, nome, cpf, telefone</span>
+<span class="cm">// "implements Auditavel" = Aluno se compromete a ter registrarLog e obterHistorico</span>
+<span class="kw">public class</span> <span class="cls">Aluno</span> <span class="kw">extends</span> <span class="cls">Pessoa</span> <span class="kw">implements</span> <span class="iface">Auditavel</span> {
+
+    <span class="cm">// Atributos ESPECÍFICOS de Aluno (além dos herdados de Pessoa)</span>
+    <span class="kw">private</span> <span class="cls">String</span> email;
+    <span class="kw">private</span> <span class="cls">LocalDate</span> dataMatricula;
+    <span class="kw">private</span> <span class="cls">Plano</span> plano;
+
+    <span class="kw">public</span> <span class="fn">Aluno</span>(<span class="kw">int</span> id, <span class="cls">String</span> nome, <span class="cls">String</span> cpf, <span class="cls">String</span> telefone,
+                 <span class="cls">String</span> email, <span class="cls">LocalDate</span> dataNascimento,
+                 <span class="cls">LocalDate</span> dataMatricula, <span class="cls">Plano</span> plano) {
+        <span class="cm">// Chama o construtor de Pessoa para inicializar id, nome, cpf, telefone</span>
+        <span class="kw">super</span>(id, nome, cpf, telefone);
+        <span class="kw">this</span>.email = email;
+        <span class="kw">this</span>.dataMatricula = dataMatricula;
+        <span class="kw">this</span>.plano = plano;
+    }
+
+    <span class="cm">// Implementação do método abstrato de Pessoa</span>
+    <span class="ann">@Override</span>
+    <span class="kw">public void</span> <span class="fn">exibirDetalhes</span>() {
+        System.out.println(<span class="str">"--- Detalhes do Aluno ---"</span>);
+        <span class="fn">exibirInformacoesBasicas</span>();  <span class="cm">// método herdado de Pessoa</span>
+        System.out.println(<span class="str">"Email: "</span> + email);
+        System.out.println(<span class="str">"Status do Plano: "</span> + (<span class="fn">isPlanoAtivo</span>() ? <span class="str">"✅ Ativo"</span> : <span class="str">"❌ Vencido"</span>));
+    }
+
+    <span class="cm">// Implementação do método abstrato de Pessoa</span>
+    <span class="ann">@Override</span>
+    <span class="kw">public double</span> <span class="fn">calcularCustoMensal</span>() {
+        <span class="kw">return</span> <span class="num">0</span>;  <span class="cm">// Aluno é receita, não custo para a academia</span>
+    }
+}</div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">O <code>super(id, nome, cpf, telefone)</code> é obrigatório quando a superclasse não tem construtor sem argumentos. Ele diz: "antes de configurar as coisas específicas do Aluno, inicializa os atributos de Pessoa."</div>
+    </div>
+  </section>
+
+  <!-- POLIMORFISMO -->
+  <section class="section" id="polimorfismo">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <div class="section-title-wrap">
+        <h2>Polimorfismo <span class="badge purple">CP2</span></h2>
+        <p>O mesmo método, comportamentos diferentes</p>
+      </div>
+    </div>
+
+    <p>Polimorfismo vem do grego: "muitas formas". Na POO, significa que o <strong>mesmo método</strong> pode ter comportamentos diferentes dependendo de qual objeto o está executando.</p>
+
+    <div class="analogy">
+      <p>Imagine que você manda uma mensagem de texto "Qual é o seu custo mensal?" para três funcionários diferentes da academia. O <strong>Instrutor</strong> responde "R$ 2.500,00". O <strong>Funcionário</strong> responde "R$ 1.800,00". O <strong>Aluno</strong> responde "R$ 0,00 — eu sou receita, não custo!". Todos respondem à mesma pergunta (<code>calcularCustoMensal()</code>), mas cada um responde de forma diferente. Isso é polimorfismo.</p>
+    </div>
+
+    <h3>Sobrescrita de método com @Override</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Polimorfismo em ação</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="cm">// Pessoa é abstrata, mas podemos usar como tipo de variável</span>
+<span class="cls">ArrayList</span>&lt;<span class="cls">Pessoa</span>&gt; pessoas = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// Adicionamos objetos de tipos DIFERENTES na mesma lista</span>
+pessoas.add(<span class="kw">new</span> <span class="cls">Aluno</span>(...));       <span class="cm">// calcularCustoMensal() → 0.0</span>
+pessoas.add(<span class="kw">new</span> <span class="cls">Instrutor</span>(...));   <span class="cm">// calcularCustoMensal() → 2500.0</span>
+pessoas.add(<span class="kw">new</span> <span class="cls">Funcionario</span>(...)); <span class="cm">// calcularCustoMensal() → salario</span>
+
+<span class="cm">// Para cada pessoa, Java chama o método CORRETO automaticamente</span>
+<span class="kw">for</span> (<span class="cls">Pessoa</span> p : pessoas) {
+    p.exibirDetalhes();           <span class="cm">// cada um exibe suas infos específicas</span>
+    p.calcularCustoMensal();      <span class="cm">// cada um retorna seu próprio valor</span>
+}</div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">O <code>@Override</code> não é obrigatório, mas é uma boa prática. Ele diz ao compilador: "estou intencionalmente sobrescrevendo um método da superclasse". Se você errar o nome do método, o compilador vai avisar em vez de criar um método novo silenciosamente.</div>
+    </div>
+
+    <h3>Sobrecarga (Overloading) — diferente de sobrescrita</h3>
+    <p>A sobrecarga é quando você tem <strong>dois métodos com o mesmo nome</strong> mas parâmetros diferentes na mesma classe. Isso também foi implementado em <code>Aluno</code>.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Sobrecarga vs Sobrescrita</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="cm">// SOBRESCRITA (Override) — mesmo método, classe diferente</span>
+<span class="cm">// Pessoa define:  public void exibirDetalhes()</span>
+<span class="cm">// Aluno sobrescreve com @Override</span>
+
+<span class="cm">// SOBRECARGA (Overloading) — mesmo método, parâmetros diferentes, mesma classe</span>
+<span class="cm">// calcularMensalidade() → sem desconto</span>
+<span class="cm">// calcularMensalidade(double desconto) → com desconto aplicado</span>
+<span class="kw">public double</span> <span class="fn">calcularMensalidade</span>() {
+    <span class="kw">return</span> plano.getValorMensal();
+}
+
+<span class="kw">public double</span> <span class="fn">calcularMensalidade</span>(<span class="kw">double</span> desconto) {
+    <span class="kw">return</span> plano.getValorMensal() * (<span class="num">1</span> - desconto);  <span class="cm">// ex: 10% de desconto</span>
+}</div>
+    </div>
+  </section>
+
+  <!-- CLASSE ABSTRATA -->
+  <section class="section" id="abstrata">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <div class="section-title-wrap">
+        <h2>Classe Abstrata <span class="badge green">CP3</span></h2>
+        <p>Classes que existem apenas para ser herdadas</p>
+      </div>
+    </div>
+
+    <p>Uma classe abstrata é uma classe que <strong>não pode ser instanciada</strong> — você não pode fazer <code>new Pessoa()</code>. Ela existe apenas para ser a base de outras classes. Pode ter métodos concretos (implementados) e métodos abstratos (que as subclasses são obrigadas a implementar).</p>
+
+    <div class="analogy">
+      <p>Pense em "Veículo". Não existe um veículo genérico — existe carro, moto, ônibus. "Veículo" é um conceito abstrato. Da mesma forma, "Pessoa" no nosso sistema é abstrata: na academia real, toda pessoa é especificamente aluno, instrutor ou funcionário. <strong>Não existe uma "Pessoa genérica" cadastrada.</strong></p>
+    </div>
+
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Tipo de Método</th>
+          <th>Na Pessoa</th>
+          <th>Nas Subclasses</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>abstract exibirDetalhes()</td>
+          <td style="color:var(--text-muted)">Declarado, não implementado</td>
+          <td>Obrigatoriamente implementado com @Override</td>
+        </tr>
+        <tr>
+          <td>abstract calcularCustoMensal()</td>
+          <td style="color:var(--text-muted)">Declarado, não implementado</td>
+          <td>Cada subclasse retorna seu próprio valor</td>
+        </tr>
+        <tr>
+          <td>exibirInformacoesBasicas()</td>
+          <td style="color:var(--accent3)">Implementado (concreto)</td>
+          <td>Herdado, pode ser chamado com super ou diretamente</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body"><strong>Diferença crucial:</strong> Classe abstrata usa <code>extends</code> e uma classe só pode herdar de <strong>uma</strong> classe abstrata. Interface usa <code>implements</code> e uma classe pode implementar <strong>várias</strong> interfaces. É uma das perguntas favoritas de professor.</div>
+    </div>
+  </section>
+
+  <!-- INTERFACES -->
+  <section class="section" id="interfaces">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <div class="section-title-wrap">
+        <h2>Interfaces <span class="badge purple">CP4 ★</span></h2>
+        <p>Contratos que garantem que uma classe terá determinados comportamentos</p>
+      </div>
+    </div>
+
+    <p>Uma interface é um <strong>contrato</strong>. Ela define quais métodos uma classe <em>deve</em> ter, mas não diz como implementá-los. É como assinar um contrato de prestação de serviço: você se compromete a entregar o que foi combinado, mas a forma de fazer é sua.</p>
+
+    <div class="analogy">
+      <p>Imagine uma tomada de padrão NBR (o padrão brasileiro). Qualquer aparelho que tenha o plugue correto funciona nela — não importa se é um liquidificador ou um notebook. A interface é o padrão da tomada: define o "formato", e qualquer classe que "implementa" essa interface garante que vai se encaixar.<br><br>No projeto: a interface <strong>Auditavel</strong> diz "quem me implementa garante ter <code>registrarLog()</code> e <code>obterHistorico()</code>". Tanto <code>Aluno</code> quanto <code>Instrutor</code> "se encaixam" nessa tomada.</p>
+    </div>
+
+    <h3>Interface Auditavel</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">util/Auditavel.java</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public interface</span> <span class="iface">Auditavel</span> {
+
+    <span class="cm">// Registra uma ação realizada sobre a entidade</span>
+    <span class="cm">// Exemplo: "INSCRIÇÃO na aula Yoga Matinal [ID 1]"</span>
+    <span class="kw">void</span> <span class="fn">registrarLog</span>(<span class="cls">String</span> acao);
+
+    <span class="cm">// Retorna o histórico completo de ações</span>
+    <span class="cls">String</span> <span class="fn">obterHistorico</span>();
+}</div>
+    </div>
+
+    <h3>Como Aluno implementa Auditavel</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">model/Aluno.java (trecho — Auditavel)</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public class</span> <span class="cls">Aluno</span> <span class="kw">extends</span> <span class="cls">Pessoa</span> <span class="kw">implements</span> <span class="iface">Auditavel</span> {
+
+    <span class="cm">// Lista interna de logs — privada, ninguém acessa direto</span>
+    <span class="kw">private final</span> <span class="cls">List</span>&lt;<span class="cls">String</span>&gt; historico = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;();
+
+    <span class="ann">@Override</span>
+    <span class="kw">public void</span> <span class="fn">registrarLog</span>(<span class="cls">String</span> acao) {
+        <span class="cm">// Monta a entrada com timestamp + identificação + ação</span>
+        <span class="cls">String</span> entrada = <span class="cls">LocalDateTime</span>.now() + <span class="str">" | ALUNO["</span> + id + <span class="str">"] | "</span> + acao;
+        historico.add(entrada);
+        System.out.println(<span class="str">"📝 Log: "</span> + entrada);
+    }
+
+    <span class="ann">@Override</span>
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">obterHistorico</span>() {
+        <span class="kw">if</span> (historico.isEmpty()) <span class="kw">return</span> <span class="str">"Nenhum registro."</span>;
+        <span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>(<span class="str">"=== HISTÓRICO DO ALUNO "</span> + nome + <span class="str">" ===\n"</span>);
+        historico.forEach(log -> sb.append(<span class="str">"  "</span>).append(log).append(<span class="str">"\n"</span>));
+        <span class="kw">return</span> sb.toString();
+    }
+}</div>
+    </div>
+
+    <h3>Interface Relatorio</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">util/Relatorio.java</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public interface</span> <span class="iface">Relatorio</span> {
+
+    <span class="cm">// Exibe o relatório formatado no console</span>
+    <span class="kw">void</span> <span class="fn">gerarRelatorio</span>();
+
+    <span class="cm">// Exporta o relatório para um arquivo de texto</span>
+    <span class="kw">void</span> <span class="fn">exportarParaArquivo</span>(<span class="cls">String</span> nomeArquivo);
+}</div>
+    </div>
+
+    <p>A classe <code>RelatorioService</code> implementa essa interface. Ela gera um relatório completo com: contagem de alunos ativos/vencidos, lista detalhada de cada aluno com visitas e aulas inscritas, ocupação de vagas por aula e lista de instrutores.</p>
+
+    <h3>Resumo: Classe Abstrata vs Interface</h3>
+
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Característica</th>
+          <th>Classe Abstrata (Pessoa)</th>
+          <th>Interface (Auditavel)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Palavra-chave</td>
+          <td><code>extends</code></td>
+          <td><code>implements</code></td>
+        </tr>
+        <tr>
+          <td>Quantas por classe?</td>
+          <td>Apenas uma</td>
+          <td>Várias (Aluno implementa Auditavel)</td>
+        </tr>
+        <tr>
+          <td>Pode ter atributos?</td>
+          <td>Sim</td>
+          <td>Não (só constantes)</td>
+        </tr>
+        <tr>
+          <td>Pode ter métodos implementados?</td>
+          <td>Sim (exibirInformacoesBasicas)</td>
+          <td>Não (só assinaturas)</td>
+        </tr>
+        <tr>
+          <td>Propósito</td>
+          <td>Compartilhar código e estrutura</td>
+          <td>Definir contratos de comportamento</td>
+        </tr>
+        <tr>
+          <td>No projeto</td>
+          <td>Pessoa → Aluno, Instrutor, Funcionario</td>
+          <td>Auditavel → Aluno, Instrutor; Relatorio → RelatorioService</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- DAO -->
+  <section class="section" id="dao">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <div class="section-title-wrap">
+        <h2>Padrão DAO <span class="badge orange">CP3</span></h2>
+        <p>Data Access Object — separar o código Java do banco de dados</p>
+      </div>
+    </div>
+
+    <p>DAO é um padrão de projeto que cria uma camada dedicada para <strong>todas as operações de banco de dados</strong>. O resto do sistema faz pedidos ao DAO sem saber como o banco funciona por baixo.</p>
+
+    <div class="analogy">
+      <p>Imagine um bibliotecário. Você não entra no estoque para pegar um livro você mesmo — você pede ao bibliotecário: "me traz o livro de ID 5". Ele sabe onde estão os livros, como buscá-los, e te entrega o resultado. O DAO é esse bibliotecário entre seu código Java e o banco PostgreSQL.</p>
+    </div>
+
+    <h3>Estrutura padrão de um DAO</h3>
+    <p>Todo DAO do projeto segue o mesmo padrão de 4 operações (CRUD):</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">dao/PlanoDAO.java (estrutura simplificada)</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public class</span> <span class="cls">PlanoDAO</span> {
+
+    <span class="cm">// CREATE — Insere um novo plano no banco</span>
+    <span class="kw">public boolean</span> <span class="fn">inserir</span>(<span class="cls">Plano</span> plano) {
+        <span class="cls">String</span> sql = <span class="str">"INSERT INTO plano (nome, valor_mensal, duracao_meses) VALUES (?, ?, ?)"</span>;
+        <span class="kw">try</span> (<span class="cls">Connection</span> conn = <span class="cls">ConexaoBD</span>.<span class="fn">getConexao</span>();
+             <span class="cls">PreparedStatement</span> stmt = conn.prepareStatement(sql)) {
+            stmt.setString(<span class="num">1</span>, plano.getNome());
+            stmt.setDouble(<span class="num">2</span>, plano.getValorMensal());
+            stmt.setInt(<span class="num">3</span>, plano.getDuracaoMeses());
+            <span class="kw">return</span> stmt.executeUpdate() > <span class="num">0</span>;
+        } <span class="kw">catch</span> (<span class="cls">SQLException</span> e) {
+            System.err.println(<span class="str">"Erro: "</span> + e.getMessage());
+        }
+        <span class="kw">return false</span>;
+    }
+
+    <span class="cm">// READ — Lista todos os planos</span>
+    <span class="kw">public</span> <span class="cls">List</span>&lt;<span class="cls">Plano</span>&gt; <span class="fn">listarTodos</span>() { <span class="cm">/* SELECT * FROM plano */</span> }
+
+    <span class="cm">// READ — Busca plano por ID</span>
+    <span class="kw">public</span> <span class="cls">Plano</span> <span class="fn">buscarPorId</span>(<span class="kw">int</span> id) { <span class="cm">/* SELECT * FROM plano WHERE id = ? */</span> }
+
+    <span class="cm">// UPDATE — Atualiza os dados de um plano</span>
+    <span class="kw">public boolean</span> <span class="fn">atualizar</span>(<span class="cls">Plano</span> plano) { <span class="cm">/* UPDATE plano SET ... WHERE id = ? */</span> }
+
+    <span class="cm">// DELETE — Remove um plano</span>
+    <span class="kw">public boolean</span> <span class="fn">excluir</span>(<span class="kw">int</span> id) { <span class="cm">/* DELETE FROM plano WHERE id = ? */</span> }
+}</div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">O <code>try-with-resources</code> (o <code>try (Connection conn = ...)</code>) garante que a conexão com o banco seja fechada automaticamente ao final, mesmo que ocorra um erro. Isso evita vazamento de conexões — um problema grave em sistemas reais.</div>
+    </div>
+
+    <h3>PreparedStatement — segurança contra SQL Injection</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Por que usar ? em vez de concatenar strings</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="cm">// ❌ PERIGOSO — SQL Injection! Se nome = "'; DROP TABLE aluno; --"</span>
+<span class="cls">String</span> sql = <span class="str">"SELECT * FROM aluno WHERE nome = '"</span> + nome + <span class="str">"'"</span>;
+
+<span class="cm">// ✅ SEGURO — PreparedStatement escapa os valores automaticamente</span>
+<span class="cls">String</span> sql = <span class="str">"SELECT * FROM aluno WHERE nome = ?"</span>;
+stmt.setString(<span class="num">1</span>, nome);  <span class="cm">// o ? vira o valor, sem risco de injeção</span></div>
+    </div>
+  </section>
+
+  <!-- BD SCHEMA -->
+  <section class="section" id="bd-schema">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <div class="section-title-wrap">
+        <h2>Banco de Dados <span class="badge green">CP3</span></h2>
+        <p>Estrutura das tabelas e relacionamentos</p>
+      </div>
+    </div>
+
+    <div class="db-schema">
+      <div class="db-table">
+        <div class="db-table-header">plano</div>
+        <div class="db-col pk"><span>id</span><span class="db-col-type">SERIAL PK</span></div>
+        <div class="db-col"><span>nome</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>descricao</span><span class="db-col-type">TEXT</span></div>
+        <div class="db-col"><span>valor_mensal</span><span class="db-col-type">DECIMAL</span></div>
+        <div class="db-col"><span>duracao_meses</span><span class="db-col-type">INT</span></div>
+        <div class="db-col"><span>beneficios</span><span class="db-col-type">TEXT</span></div>
+      </div>
+
+      <div class="db-table">
+        <div class="db-table-header">instrutor</div>
+        <div class="db-col pk"><span>id</span><span class="db-col-type">SERIAL PK</span></div>
+        <div class="db-col"><span>nome</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>cpf</span><span class="db-col-type">VARCHAR UNIQUE</span></div>
+        <div class="db-col"><span>telefone</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>especialidade</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>horarios_trabalho</span><span class="db-col-type">TEXT</span></div>
+      </div>
+
+      <div class="db-table">
+        <div class="db-table-header">aluno</div>
+        <div class="db-col pk"><span>id</span><span class="db-col-type">SERIAL PK</span></div>
+        <div class="db-col"><span>nome</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>cpf</span><span class="db-col-type">VARCHAR UNIQUE</span></div>
+        <div class="db-col"><span>email</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>data_nascimento</span><span class="db-col-type">DATE</span></div>
+        <div class="db-col"><span>data_matricula</span><span class="db-col-type">DATE</span></div>
+        <div class="db-col fk"><span>id_plano</span><span class="db-col-type">FK → plano</span></div>
+      </div>
+
+      <div class="db-table">
+        <div class="db-table-header">aula</div>
+        <div class="db-col pk"><span>id</span><span class="db-col-type">SERIAL PK</span></div>
+        <div class="db-col"><span>nome</span><span class="db-col-type">VARCHAR</span></div>
+        <div class="db-col"><span>capacidade_maxima</span><span class="db-col-type">INT</span></div>
+        <div class="db-col"><span>horario</span><span class="db-col-type">TIMESTAMP</span></div>
+        <div class="db-col"><span>duracao_minutos</span><span class="db-col-type">INT</span></div>
+        <div class="db-col fk"><span>id_instrutor</span><span class="db-col-type">FK → instrutor</span></div>
+      </div>
+
+      <div class="db-table">
+        <div class="db-table-header">inscricao_aula</div>
+        <div class="db-col fk"><span>id_aluno</span><span class="db-col-type">FK → aluno</span></div>
+        <div class="db-col fk"><span>id_aula</span><span class="db-col-type">FK → aula</span></div>
+        <div class="db-col pk"><span>PK composta</span><span class="db-col-type">(id_aluno, id_aula)</span></div>
+        <div class="db-col"><span>data_inscricao</span><span class="db-col-type">TIMESTAMP</span></div>
+      </div>
+
+      <div class="db-table">
+        <div class="db-table-header">frequencia</div>
+        <div class="db-col pk"><span>id</span><span class="db-col-type">SERIAL PK</span></div>
+        <div class="db-col fk"><span>id_aluno</span><span class="db-col-type">FK → aluno CASCADE</span></div>
+        <div class="db-col"><span>data_hora_entrada</span><span class="db-col-type">TIMESTAMP</span></div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body"><strong>ON DELETE CASCADE</strong> em <code>frequencia</code> significa: se um aluno for deletado, todas as suas frequências são deletadas junto. Sem isso, o banco bloquearia a exclusão do aluno enquanto houvesse frequências vinculadas a ele (integridade referencial).</div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body"><strong>Chave primária composta</strong> em <code>inscricao_aula</code>: o par <code>(id_aluno, id_aula)</code> é único. Isso garante em nível de banco de dados que um aluno não pode se inscrever duas vezes na mesma aula.</div>
+    </div>
+  </section>
+
+  <!-- JDBC -->
+  <section class="section" id="jdbc">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <div class="section-title-wrap">
+        <h2>JDBC e ConexaoBD <span class="badge orange">CP3</span></h2>
+        <p>Como o Java se conecta ao PostgreSQL</p>
+      </div>
+    </div>
+
+    <p>JDBC (Java Database Connectivity) é a API padrão do Java para se comunicar com bancos de dados relacionais. O projeto usa o driver <strong>postgresql-xx.jar</strong> no classpath.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">dao/ConexaoBD.java</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public class</span> <span class="cls">ConexaoBD</span> {
+
+    <span class="kw">private static</span> <span class="cls">String</span> url, user, password;
+
+    <span class="cm">// Bloco estático: executa UMA VEZ quando a classe é carregada</span>
+    <span class="kw">static</span> {
+        <span class="cls">Properties</span> props = <span class="kw">new</span> <span class="cls">Properties</span>();
+        <span class="kw">try</span> (<span class="cls">FileInputStream</span> fis = <span class="kw">new</span> <span class="cls">FileInputStream</span>(<span class="str">"config.properties"</span>)) {
+            props.load(fis);
+            url      = props.getProperty(<span class="str">"db.url"</span>);       <span class="cm">// jdbc:postgresql://localhost:5432/academia_db</span>
+            user     = props.getProperty(<span class="str">"db.user"</span>);      <span class="cm">// postgres</span>
+            password = props.getProperty(<span class="str">"db.password"</span>);  <span class="cm">// sua_senha</span>
+        } <span class="kw">catch</span> (<span class="cls">IOException</span> e) {
+            <span class="cm">// Fallback: valores padrão se o arquivo não existir</span>
+            url = <span class="str">"jdbc:postgresql://localhost:5432/academia_db"</span>;
+            user = <span class="str">"postgres"</span>;
+            password = <span class="str">"root"</span>;
+        }
+    }
+
+    <span class="kw">public static</span> <span class="cls">Connection</span> <span class="fn">getConexao</span>() <span class="kw">throws</span> <span class="cls">SQLException</span> {
+        <span class="kw">try</span> {
+            <span class="cm">// Carrega o driver JDBC do PostgreSQL</span>
+            <span class="cls">Class</span>.forName(<span class="str">"org.postgresql.Driver"</span>);
+            <span class="kw">return</span> <span class="cls">DriverManager</span>.getConnection(url, user, password);
+        } <span class="kw">catch</span> (<span class="cls">ClassNotFoundException</span> e) {
+            <span class="kw">throw new</span> <span class="cls">SQLException</span>(<span class="str">"Driver não encontrado. Coloque o .jar no classpath."</span>);
+        }
+    }
+}</div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">As credenciais ficam no arquivo <code>config.properties</code>, que está no <code>.gitignore</code>. Assim a senha nunca vai para o repositório. Existe um <code>config.properties.example</code> com os campos sem a senha real — bom exemplo de segurança em projetos reais.</div>
+    </div>
+  </section>
+
+  <!-- REGRA DE NEGÓCIO -->
+  <section class="section" id="regra">
+    <div class="section-header">
+      <span class="section-num">13</span>
+      <div class="section-title-wrap">
+        <h2>Regra de Negócio Complexa <span class="badge purple">CP4 ★</span></h2>
+        <p>InscricaoService — 5 validações em cascata antes de confirmar uma inscrição</p>
+      </div>
+    </div>
+
+    <p>Esta é a parte mais importante do CP4. O <code>InscricaoService</code> implementa a lógica completa de inscrição de um aluno em uma aula, realizando 5 verificações em sequência. Se qualquer uma falhar, a inscrição é recusada com uma mensagem explicativa.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot num">1</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <div class="step-title">Aluno existe no banco?</div>
+          <div class="step-desc">Chama <code>alunoDAO.buscarPorId(idAluno)</code>. Se retornar <code>null</code>, o aluno não existe.</div>
+          <div class="step-fail">❌ "Aluno não encontrado (ID X)"</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot num">2</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <div class="step-title">Plano do aluno está ativo?</div>
+          <div class="step-desc">Chama <code>aluno.isPlanoAtivo()</code> — que calcula <code>dataMatricula + duracaoMeses</code> e compara com hoje.</div>
+          <div class="step-fail">❌ "Plano vencido em [data]. Renove para se inscrever."</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot num">3</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <div class="step-title">Aula existe no banco?</div>
+          <div class="step-desc">Chama <code>aulaDAO.buscarPorId(idAula)</code>. Valida antes de qualquer outra operação relacionada à aula.</div>
+          <div class="step-fail">❌ "Aula não encontrada (ID X)"</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot num">4</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <div class="step-title">Há vagas disponíveis?</div>
+          <div class="step-desc">Conta inscritos com <code>inscricaoDAO.contarInscritosNaAula()</code> e compara com <code>aula.getCapacidadeMaxima()</code>.</div>
+          <div class="step-fail">❌ "Capacidade máxima atingida (X/X alunos)"</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot num">5</div>
+          <div class="flow-connector"></div>
+        </div>
+        <div class="flow-content">
+          <div class="step-title">Conflito de horário?</div>
+          <div class="step-desc">Busca se o aluno já tem outra aula no mesmo horário: <code>inscricaoDAO.buscarConflitoHorario(idAluno, aula.getHorario())</code>.</div>
+          <div class="step-fail">❌ "Conflito com aula [Nome] no mesmo horário"</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-line">
+          <div class="flow-dot ok">✓</div>
+        </div>
+        <div class="flow-content">
+          <div class="step-title" style="color:var(--accent3)">Todas as validações passaram!</div>
+          <div class="step-desc">Persiste a inscrição no banco, registra log de auditoria via <code>aluno.registrarLog(...)</code> e retorna mensagem de sucesso.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>O código completo do método</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">service/InscricaoService.java — inscreverAluno()</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="kw">public</span> <span class="cls">String</span> <span class="fn">inscreverAluno</span>(<span class="kw">int</span> idAluno, <span class="kw">int</span> idAula) {
+
+    <span class="cm">// VALIDAÇÃO 1: O aluno existe no banco?</span>
+    <span class="cls">Aluno</span> aluno = alunoDAO.<span class="fn">buscarPorId</span>(idAluno);
+    <span class="kw">if</span> (aluno == <span class="kw">null</span>) {
+        <span class="kw">return</span> <span class="str">"❌ Erro: Aluno não encontrado (ID "</span> + idAluno + <span class="str">")."</span>;
+    }
+
+    <span class="cm">// VALIDAÇÃO 2: O plano está dentro do prazo?</span>
+    <span class="cm">// isPlanoAtivo() faz: LocalDate.now().isAfter(dataMatricula.plusMonths(duracao))</span>
+    <span class="kw">if</span> (!aluno.<span class="fn">isPlanoAtivo</span>()) {
+        <span class="kw">return</span> <span class="str">"❌ Plano de "</span> + aluno.getNome() + <span class="str">" vencido em "</span>
+             + aluno.<span class="fn">getDataVencimentoPlano</span>() + <span class="str">". Renove para se inscrever."</span>;
+    }
+
+    <span class="cm">// VALIDAÇÃO 3: A aula existe?</span>
+    <span class="cls">Aula</span> aula = aulaDAO.<span class="fn">buscarPorId</span>(idAula);
+    <span class="kw">if</span> (aula == <span class="kw">null</span>) {
+        <span class="kw">return</span> <span class="str">"❌ Erro: Aula não encontrada (ID "</span> + idAula + <span class="str">")."</span>;
+    }
+
+    <span class="cm">// VALIDAÇÃO 4: Ainda tem vagas?</span>
+    <span class="kw">int</span> inscritos = inscricaoDAO.<span class="fn">contarInscritosNaAula</span>(idAula);
+    <span class="kw">if</span> (inscritos >= aula.<span class="fn">getCapacidadeMaxima</span>()) {
+        <span class="kw">return</span> <span class="str">"❌ Capacidade máxima atingida ("</span>
+             + inscritos + <span class="str">"/"</span> + aula.<span class="fn">getCapacidadeMaxima</span>() + <span class="str">")."</span>;
+    }
+
+    <span class="cm">// VALIDAÇÃO 5: Tem conflito de horário?</span>
+    <span class="cls">Aula</span> conflito = inscricaoDAO.<span class="fn">buscarConflitoHorario</span>(idAluno, aula.<span class="fn">getHorario</span>());
+    <span class="kw">if</span> (conflito != <span class="kw">null</span>) {
+        <span class="kw">return</span> <span class="str">"❌ Conflito! Aluno já inscrito em \""</span>
+             + conflito.<span class="fn">getNome</span>() + <span class="str">"\" no mesmo horário."</span>;
+    }
+
+    <span class="cm">// TUDO OK — persiste no banco</span>
+    <span class="kw">boolean</span> sucesso = inscricaoDAO.<span class="fn">salvarInscricao</span>(idAluno, idAula);
+    <span class="kw">if</span> (sucesso) {
+        <span class="cm">// Registra auditoria usando a interface Auditavel</span>
+        aluno.<span class="fn">registrarLog</span>(<span class="str">"INSCRIÇÃO na aula \""</span> + aula.<span class="fn">getNome</span>() + <span class="str">"\" [ID "</span> + idAula + <span class="str">"]"</span>);
+        <span class="kw">return</span> <span class="str">"✅ Sucesso: "</span> + aluno.<span class="fn">getNome</span>() + <span class="str">" inscrito em \""</span>
+             + aula.<span class="fn">getNome</span>() + <span class="str">"\"."</span>;
+    }
+    <span class="kw">return</span> <span class="str">"❌ Erro inesperado. Tente novamente."</span>;
+}</div>
+    </div>
+
+    <h3>Como isPlanoAtivo() funciona</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">model/Aluno.java — cálculo de vencimento</span>
+        <span class="code-lang">Java</span>
+      </div>
+      <div class="code-content"><span class="cm">// Calcula a data de vencimento: dataMatricula + duração do plano em meses</span>
+<span class="kw">public</span> <span class="cls">LocalDate</span> <span class="fn">getDataVencimentoPlano</span>() {
+    <span class="kw">if</span> (plano == <span class="kw">null</span>) <span class="kw">return</span> dataMatricula;
+    <span class="kw">return</span> dataMatricula.plusMonths(plano.<span class="fn">getDuracaoMeses</span>());
+    <span class="cm">// Ex: matricula em 01/01/2025, plano 3 meses → vence em 01/04/2025</span>
+}
+
+<span class="cm">// Retorna true se hoje ainda está dentro do prazo</span>
+<span class="kw">public boolean</span> <span class="fn">isPlanoAtivo</span>() {
+    <span class="cls">LocalDate</span> vencimento = <span class="fn">getDataVencimentoPlano</span>();
+    <span class="kw">return</span> !<span class="cls">LocalDate</span>.now().isAfter(vencimento);
+    <span class="cm">// "hoje NÃO é depois do vencimento" = plano ainda está ativo</span>
+}</div>
+    </div>
+  </section>
+
+  <!-- CRUD -->
+  <section class="section" id="crud">
+    <div class="section-header">
+      <span class="section-num">14</span>
+      <div class="section-title-wrap">
+        <h2>CRUD Completo <span class="badge green">CP4</span></h2>
+        <p>Create, Read, Update, Delete — para todas as entidades</p>
+      </div>
+    </div>
+
+    <table class="crud-table">
+      <thead>
+        <tr>
+          <th>Entidade</th>
+          <th>Create</th>
+          <th>Read (lista)</th>
+          <th>Read (busca)</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Plano</td>
+          <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+        </tr>
+        <tr>
+          <td>Aluno</td>
+          <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+        </tr>
+        <tr>
+          <td>Instrutor</td>
+          <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+        </tr>
+        <tr>
+          <td>Aula</td>
+          <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+        </tr>
+        <tr>
+          <td>Frequência</td>
+          <td>✅</td><td>✅</td><td style="color:var(--text-dim)">—</td><td style="color:var(--text-dim)">—</td><td style="color:var(--text-dim)">—</td>
+        </tr>
+        <tr>
+          <td>Inscrição</td>
+          <td>✅</td><td>✅</td><td style="color:var(--text-dim)">—</td><td style="color:var(--text-dim)">—</td><td>✅</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">Frequência e Inscrição não têm Update por design: faz sentido no negócio. Uma entrada na academia é um registro imutável de um momento no tempo. Uma inscrição se cancela, mas não se "atualiza" — cancela a atual e cria uma nova.</div>
+    </div>
+  </section>
+
+  <!-- PERGUNTAS PROVÁVEIS -->
+  <section class="section" id="perguntas">
+    <div class="section-header">
+      <span class="section-num">15</span>
+      <div class="section-title-wrap">
+        <h2>Perguntas Prováveis do Professor</h2>
+        <p>Prepare respostas claras para cada uma</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">Por que Pessoa é abstrata e não uma classe normal?</div>
+      <div class="qa-a">Porque no contexto do nosso sistema, não faz sentido existir uma "Pessoa genérica" cadastrada. Toda pessoa é especificamente aluno, instrutor ou funcionário. A abstração também obriga cada subclasse a implementar <code>exibirDetalhes()</code> e <code>calcularCustoMensal()</code>, garantindo que nunca esquecemos de implementar esses métodos em uma nova subclasse.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">Qual a diferença entre classe abstrata e interface no projeto?</div>
+      <div class="qa-a"><code>Pessoa</code> é classe abstrata: compartilha código real (atributos <code>id, nome, cpf</code> e o método concreto <code>exibirInformacoesBasicas()</code>). Uma subclasse só pode herdar de uma classe abstrata. <code>Auditavel</code> é interface: só define o contrato (quais métodos devem existir), sem implementação. Uma classe pode implementar várias interfaces simultaneamente — <code>Aluno</code> implementa <code>Auditavel</code> enquanto também herda de <code>Pessoa</code>.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">Por que a regra de negócio está no InscricaoService e não no DAO?</div>
+      <div class="qa-a">Separação de responsabilidades. O DAO só sabe persistir e buscar dados — ele não deve saber se um plano está vencido ou se há conflito de horário. O Service centraliza a lógica de negócio. Se amanhã a regra mudar (ex: alunos Premium podem se inscrever mesmo com plano vencido), mudamos só o Service, sem tocar o DAO ou o model.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">O que é polimorfismo e onde ele aparece no projeto?</div>
+      <div class="qa-a">Polimorfismo é quando objetos de tipos diferentes respondem ao mesmo método de formas diferentes. No projeto: <code>calcularCustoMensal()</code> existe em <code>Pessoa</code>, mas <code>Aluno</code> retorna 0, <code>Instrutor</code> retorna o salário (R$2.500) e <code>Funcionario</code> retorna o salário cadastrado. Se fizermos um <code>ArrayList&lt;Pessoa&gt;</code> com os três, ao chamar <code>calcularCustoMensal()</code> em cada um, Java chama automaticamente a versão correta para cada tipo.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">Por que usar PreparedStatement em vez de concatenar strings SQL?</div>
+      <div class="qa-a">Segurança. Concatenar strings SQL permite SQL Injection — um atacante pode digitar um nome como <code>' OR 1=1 --</code> e manipular a query. O PreparedStatement usa <code>?</code> como placeholder e escapa automaticamente os valores, tornando isso impossível. Além disso, PreparedStatement é pré-compilado pelo banco, sendo mais eficiente.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">Por que as interfaces Auditavel e Relatorio foram escolhidas?</div>
+      <div class="qa-a"><code>Auditavel</code> foi escolhida porque rastreabilidade é um comportamento que classes não relacionadas podem precisar — tanto <code>Aluno</code> quanto <code>Instrutor</code> precisam logar ações, mas eles não têm outra relação entre si. <code>Relatorio</code> define o contrato de geração de relatórios: qualquer classe que precise gerar relatórios implementa essa interface, garantindo que sempre haverá <code>gerarRelatorio()</code> e <code>exportarParaArquivo()</code>.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">O que é encapsulamento e como está aplicado?</div>
+      <div class="qa-a">Encapsulamento é proteger os dados internos de uma classe, expondo acesso só através de métodos controlados. No projeto, todos os atributos das classes model são <code>private</code>. O acesso é feito via getters/setters. Isso permite que no futuro, um setter possa incluir validação sem quebrar o resto do código. Exemplo: <code>ValidadorUtil.validarCpf()</code> pode ser chamado dentro de <code>setCpf()</code> para garantir que nenhum CPF inválido seja aceito.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">Como funciona o try-with-resources nos DAOs?</div>
+      <div class="qa-a">O <code>try (Connection conn = ConexaoBD.getConexao(); ...)</code> garante que a conexão com o banco seja fechada automaticamente ao sair do bloco — mesmo se ocorrer uma exceção. Sem isso, conexões ficariam abertas e vazariam recursos, eventualmente esgotando o pool de conexões do banco. É um padrão essencial em código de produção.</div>
+    </div>
+
+    <div class="qa">
+      <div class="qa-q">O que é o padrão DAO e por que usá-lo?</div>
+      <div class="qa-a">DAO (Data Access Object) centraliza toda a comunicação com o banco em classes dedicadas. As vantagens são: o código de negócio não mistura SQL com lógica Java; se trocarmos de banco (PostgreSQL → MySQL), mudamos só os DAOs; fica muito mais fácil testar o código em isolamento. No projeto, cada entidade tem seu próprio DAO com os mesmos 4 métodos básicos: inserir, listar, buscarPorId, atualizar, excluir.</div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Smooth scroll + active nav links
+  const links = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('section[id], div[id]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.style.borderLeftColor = 'transparent');
+        const active = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+        if (active) {
+          active.style.borderLeftColor = 'var(--accent)';
+          active.style.color = 'var(--text)';
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
